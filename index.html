@@ -1,0 +1,20 @@
+<html>
+<head>
+  <script src="bitty.js"></script>
+</head>
+<body>
+  <div id="content">
+  </div>
+  <script>
+    window.c = document.getElementById("content");
+
+    fetch("bitty.js").then(function(response) {
+      if (response.ok) {
+        return response.arrayBuffer().then(function(buffer) {
+          window.bitty = new BinaryViewer(c, new Uint8Array(buffer), 8, 2, 2, 1);
+        })
+      }
+    })
+  </script>
+</body>
+</html>
