@@ -3,18 +3,48 @@
   <script src="bitty.js"></script>
 </head>
 <body>
+  <h1 id="header"></h1>
   <div id="content">
   </div>
   <script>
-    window.c = document.getElementById("content");
+    exposeFSServer = "http://192.168.99.100:32768";
 
-    fetch("bitty.js").then(function(response) {
-      if (response.ok) {
-        return response.arrayBuffer().then(function(buffer) {
-          window.bitty = new BinaryViewer(c, new Uint8Array(buffer), 8, 2, 2, 1);
-        })
+    bitty = new BinaryViewer(document.getElementById("content"), new Uint8Array(document.currentScript), 16, 4, 4, 8);
+    load("bitty.js")
+
+    function explore(exposeListing) {
+      for (var file of exposeListing) {
+        if (!file.type) {
+          continue
+        }
+        console.log(file);
+        if (file.type === "file" && file.size > 0) {
+            load(exposeFSServer + file.path);
+        } else if (file.type === "directory") {
+          fetch(exposeFSServer + file.path).then(traverse);
+        }
       }
-    })
+    }
+
+    function traverse(response) {
+      if (response.ok) {
+        return response.json().then(explore);
+      }
+    }
+
+    fetch(exposeFSServer).then(traverse);
+
+    function load(url) {
+      fetch(url).then(function(response) {
+        if (response.ok) {
+          return response.arrayBuffer().then(function(buffer) {
+            bitty.buffer = new Uint8Array(buffer.slice(0,8192));
+            bitty.redraw();
+          })
+        }
+      })
+    }
+
   </script>
 </body>
 </html>
