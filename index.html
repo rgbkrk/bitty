@@ -3,7 +3,7 @@
   <script src="bitty.js"></script>
 </head>
 <body>
-  <h1 id="header"></h1>
+  <h1 id="name"></h1>
   <div id="content">
   </div>
   <script>
@@ -40,6 +40,7 @@
           return response.arrayBuffer().then(function(buffer) {
             bitty.buffer = new Uint8Array(buffer.slice(0,8192));
             bitty.redraw();
+            document.querySelector('#name').innerText = url;
           })
         }
       })
